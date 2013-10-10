@@ -17,8 +17,8 @@ public class SimpleTopology {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout("spout", new RandomDataSpout(1000));
-        builder.setBolt("split", new SplittingBolt(), 8).shuffleGrouping("spout");
-        builder.setBolt("dump", new AckingBolt(), 4).fieldsGrouping("split", new Fields("date"));
+        builder.setBolt("tokenize", new SplittingBolt(), 8).shuffleGrouping("spout");
+        builder.setBolt("count", new CountingBolt(), 4).fieldsGrouping("tokenize", new Fields("word"));
 
         Config conf = new Config();
         conf.setDebug(true);

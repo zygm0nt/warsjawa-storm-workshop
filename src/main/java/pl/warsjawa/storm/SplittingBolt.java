@@ -25,21 +25,17 @@ public class SplittingBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        int counter = 0;
-        for (char c : tuple.getStringByField(RandomDataSpout.FIELD_CONTENT).toCharArray()) {
-            _collector.emit(tuple, new Values(new Date(), counter, "" + c, counter % 3 == 0));
-            counter++;
+        String sentence = tuple.getStringByField(RandomDataSpout.FIELD_CONTENT);
+        for (String word : sentence.split(" ")) {
+            _collector.emit(tuple, new Values(word));
         }
         _collector.ack(tuple);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(FIELD_DATE, FIELD_LINE_NO, FIELD_CONTENT, FIELD_IS_VALID));
+        declarer.declare(new Fields(FIELD_WORD));
     }
 
-    public static String FIELD_DATE = "date";
-    public static String FIELD_LINE_NO = "line_no";
-    public static String FIELD_CONTENT = "content";
-    public static String FIELD_IS_VALID = "is_valid";
+    public static String FIELD_WORD = "word";
 }
