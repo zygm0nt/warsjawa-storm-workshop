@@ -5,6 +5,8 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -13,6 +15,7 @@ import java.util.Map;
  */
 public class AckingBolt extends BaseRichBolt {
 
+    private final Logger log = LoggerFactory.getLogger("CUSTOM_LOG_FILE");
     private OutputCollector _collector;
 
     @Override
@@ -22,7 +25,14 @@ public class AckingBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        _collector.ack(tuple);
+        String msg = tuple.getStringByField(SplittingBolt.FIELD_CONTENT);
+        boolean isValid = tuple.getBooleanByField(SplittingBolt.FIELD_IS_VALID);
+        if (isValid) {
+            _collector.ack(tuple);
+        } else {
+            _collector.fail(tuple);
+        }
+        log.info("msg: {} valid: {}", msg, isValid);
     }
 
     @Override
