@@ -6,3 +6,4 @@
 *.ear
 
 dependency-reduced-pom.xml
+run_git_daemon.sh
