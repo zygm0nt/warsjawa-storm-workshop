@@ -52,12 +52,13 @@ public class WordCount {
         spout.setCycle(true);
 
         TridentTopology topology = new TridentTopology();
-        TridentState wordCounts =
-            topology.newStream("spout1", spout)
-                    .each(new Fields("sentence"), new Split(), new Fields("word"))
-                    .groupBy(new Fields("word"))
-                    .persistentAggregate(new MemoryMapState.Factory(), new Count(), new Fields("count"))
-                    .parallelismHint(6);
+
+        topology.newStream("spout1", spout)
+                .each(new Fields("sentence"), new Split(), new Fields("word"))
+                .groupBy(new Fields("word"))
+                .aggregate(new Fields("word"), new Count(), new Fields("count"))
+                .each(new Fields("word", "count"), new PrintFilter())
+                .parallelismHint(6);
         return topology.build();
     }
 }
